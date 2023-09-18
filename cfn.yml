@@ -1,18 +1,17 @@
 AWSTemplateFormatVersion: 2010-09-09
-​
+
 Description: A simple AWS Roman numerals converter app
- 
-​
-Parameters: 
+
+Parameters:
   latestAmiId:
-    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
-    Default: '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
-​
+    Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
+    Default: "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
+
   keyName:
     Description: Chose your key pair
     Type: AWS::EC2::KeyPair::KeyName
     Default: x-pair
-​
+
 Resources:
   myWebServer:
     Type: AWS::EC2::Instance
@@ -20,11 +19,11 @@ Resources:
       ImageId: !Ref latestAmiId
       InstanceType: t2.micro
       KeyName: !Ref keyName
-      SecurityGroupIds: 
+      SecurityGroupIds:
         - !Ref mySecGrp
-      Tags: 
+      Tags:
         - Key: Name
-          Value: !Sub Web Server of ${AWS::StackName} Stack 
+          Value: !Sub Web Server of ${AWS::StackName} Stack
       UserData: !Base64 |
         #! /bin/bash
         yum update -y
@@ -37,13 +36,13 @@ Resources:
         wget -P templates https://raw.githubusercontent.com/tahiraydin/roman_numerals/main/templates/result.html
         wget https://raw.githubusercontent.com/tahiraydin/roman_numerals/main/app.py
         python3 app.py
-​
+
   mySecGrp:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: ssh http and port 8080 # Required
       GroupName: taydinsecgrpromen
-      SecurityGroupIngress: 
+      SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
@@ -56,10 +55,10 @@ Resources:
           FromPort: 8080
           ToPort: 8080
           CidrIp: 0.0.0.0/0
-  
+
 Outputs:
   WebsiteURL:
-    Value: !Sub 
+    Value: !Sub
       - http://${PIA}
       - PIA: !GetAtt myWebServer.PublicDnsName
     Description: Roman Numerals Converter Application URL
